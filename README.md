@@ -1,100 +1,101 @@
 # 🖼 Wallpaper Manager
 
-Automatické náhodné striedanie wallpaperov pre **GNOME na Waylande**.
+Automatic random wallpaper rotation for **GNOME on Wayland**.
 
-Skladá sa z dvoch častí:
-- **`wallpaper_daemon.py`** — beží na pozadí ako systemd user service, rotuje wallpapery
-- **`wallpaper_manager.py`** — TUI ovládač v termináli, komunikuje s daemonom cez Unix socket
+Consists of two parts:
+
+* **`wallpaper_daemon.py`** — runs in the background as a systemd user service, rotates wallpapers
+* **`wallpaper_manager.py`** — TUI controller in the terminal, communicates with the daemon via Unix socket
 
 ---
 
-## Požiadavky
+## Requirements
 
-- Python 3.10+
-- GNOME + Wayland
-- `textual` knižnica
+* Python 3.10+
+* GNOME + Wayland
+* `textual` library
 
-```bash
+```
 pip install textual --break-system-packages
 ```
 
 ---
 
-## Inštalácia
+## Installation
 
-```bash
-# 1. Skopíruj skripty
+```
+# 1. Copy the scripts
 mkdir -p ~/.local/bin
 cp wallpaper_daemon.py ~/.local/bin/
 cp wallpaper_manager.py ~/.local/bin/
 
-# 2. Nainštaluj systemd service
+# 2. Install the systemd service
 mkdir -p ~/.config/systemd/user
 cp wallpaper-daemon.service ~/.config/systemd/user/
 
-# 3. Spusti daemon
+# 3. Start the daemon
 systemctl --user daemon-reload
 systemctl --user enable wallpaper-daemon
 systemctl --user start wallpaper-daemon
 ```
 
-Daemon sa automaticky spustí po každom prihlásení.
+The daemon will start automatically on every login.
 
 ---
 
-## Použitie
+## Usage
 
-### TUI ovládač
+### TUI Controller
 
-```bash
+```
 python3 ~/.local/bin/wallpaper_manager.py
 ```
 
-| Klávesa | Akcia |
-|---------|-------|
-| `N` | Okamžitá zmena wallpaperu |
-| `Space` | Pozastaviť / Spustiť rotáciu |
-| `R` | Obnoviť stav |
-| `Q` | Zavrieť TUI |
+| Key | Action |
+| --- | --- |
+| `N` | Immediately change wallpaper |
+| `Space` | Pause / Resume rotation |
+| `R` | Refresh status |
+| `Q` | Close TUI |
 
-### Správa daemona
+### Daemon Management
 
-```bash
-# Stav
+```
+# Status
 systemctl --user status wallpaper-daemon
 
-# Zastaviť / Spustiť / Reštartovať
+# Stop / Start / Restart
 systemctl --user stop wallpaper-daemon
 systemctl --user start wallpaper-daemon
 systemctl --user restart wallpaper-daemon
 
-# Logy
+# Logs
 journalctl --user -u wallpaper-daemon -f
 ```
 
 ---
 
-## Konfigurácia
+## Configuration
 
-Konfig sa ukladá automaticky do `~/.config/wallpaper-manager/config.json`:
+The config is automatically saved to `~/.config/wallpaper-manager/config.json`:
 
-```json
+```
 {
   "wallpaper_dir": "/home/user/wallpapers",
   "interval": 300
 }
 ```
 
-| Parameter | Popis | Predvolená hodnota |
-|-----------|-------|-------------------|
-| `wallpaper_dir` | Adresár s wallpapermi (vrátane podadresárov) | `~/wallpapers` |
-| `interval` | Interval striedania v sekundách | `300` (5 minút) |
+| Parameter | Description | Default value |
+| --- | --- | --- |
+| `wallpaper_dir` | Directory with wallpapers (including subdirectories) | `~/wallpapers` |
+| `interval` | Rotation interval in seconds | `300` (5 minutes) |
 
-Podporované formáty: `.jpg`, `.jpeg`, `.png`, `.webp`, `.bmp`
+Supported formats: `.jpg`, `.jpeg`, `.png`, `.webp`, `.bmp`
 
 ---
 
-## Štruktúra súborov
+## File Structure
 
 ```
 ~/.local/bin/
@@ -105,30 +106,33 @@ Podporované formáty: `.jpg`, `.jpeg`, `.png`, `.webp`, `.bmp`
 └── wallpaper-daemon.service  # systemd service
 
 ~/.config/wallpaper-manager/
-├── config.json               # konfigurácia
-├── daemon.sock               # Unix socket (vytvára sa za behu)
-└── daemon.log                # log súbor
+├── config.json               # configuration
+├── daemon.sock               # Unix socket (created at runtime)
+└── daemon.log                # log file
 ```
 
 ---
 
-## Riešenie problémov
+## Troubleshooting
 
-**Daemon nebeží po reštarte:**
-```bash
+**Daemon not running after restart:**
+
+```
 loginctl enable-linger $USER
 systemctl --user daemon-reload
 systemctl --user enable wallpaper-daemon
 ```
 
-**Wallpaper sa nemení (Wayland/GNOME):**
-```bash
-# Over či gsettings funguje
+**Wallpaper not changing (Wayland/GNOME):**
+
+```
+# Check if gsettings works
 gsettings get org.gnome.desktop.background picture-uri
 ```
 
-**TUI hlási "Daemon nedostupný":**
-```bash
+**TUI reports "Daemon unavailable":**
+
+```
 systemctl --user start wallpaper-daemon
 journalctl --user -u wallpaper-daemon -n 20
 ```
