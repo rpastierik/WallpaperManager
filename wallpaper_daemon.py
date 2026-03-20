@@ -191,7 +191,7 @@ class WallpaperDaemon:
         elif action == "set_dir":
             d = cmd.get("dir", "")
             if not Path(d).is_dir():
-                return {"ok": False, "error": f"Adresár neexistuje: {d}"}
+                return {"ok": False, "error": f"Directory does not exist: {d}"}
             with self._lock:
                 self.config["wallpaper_dir"] = d
                 save_config(self.config)
@@ -202,7 +202,7 @@ class WallpaperDaemon:
             try:
                 secs = int(cmd.get("interval", 0))
                 if secs < 5:
-                    return {"ok": False, "error": "Minimálny interval je 5 sekúnd"}
+                    return {"ok": False, "error": "Minimum interval is 5 seconds"}
                 with self._lock:
                     self.config["interval"] = secs
                     save_config(self.config)
@@ -211,7 +211,7 @@ class WallpaperDaemon:
                 log(f"Interval set to {secs}s")
                 return {"ok": True}
             except ValueError:
-                return {"ok": False, "error": "Neplatná hodnota"}
+                return {"ok": False, "error": "Invalid value"}
 
         elif action == "stop":
             self.running = False
