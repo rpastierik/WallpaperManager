@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.2.0] - 2026-03-20
+
+### Added
+
+* `wallpaper_tray.py` — system tray app for GNOME using `AyatanaAppIndicator3` + `Gtk`
+* Tray icon changes color based on daemon state (running / paused / offline)
+* Tray menu shows: current wallpaper name, image count, countdown to next change
+* Quick controls from tray: next wallpaper, pause/resume rotation
+* Settings dialog in tray app for changing wallpaper directory and rotation interval
+* `wallpaper-tray.desktop` — autostart entry for the tray app
+* Installation instructions for `gir1.2-ayatanaappindicator3-0.1` and the AppIndicator GNOME extension
+
+---
+
 ## [1.1.0] - 2026-03-20
 
 ### Changed
