@@ -29,6 +29,15 @@ gnome-extensions enable ubuntu-appindicators@ubuntu.com
 > **Note:** After enabling the GNOME extension, log out and back in for the tray icon to appear.
 
 ---
+## Screenshots
+
+### Wallpaper manager (TUI)
+![wallpaper manager](screenshots/wallpaper_manager.png)
+
+### Wallpaper try
+![Wallpaper Try](screenshots/wallpaper_try.png)
+
+---
 
 ## Installation
 
