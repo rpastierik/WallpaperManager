@@ -78,11 +78,11 @@ class DirPickerScreen(ModalScreen):
 
     def compose(self) -> ComposeResult:
         with Container(id="dir-picker-container"):
-            yield Label("📁  Vyber adresár s wallpapermi", id="dir-picker-title")
+            yield Label("📁  Select wallpaper directory", id="dir-picker-title")
             yield DirectoryTree(str(Path.home()), id="dir-tree")
             with Horizontal(id="dir-picker-buttons"):
-                yield Button("✓ Potvrdiť", variant="success", id="confirm-dir")
-                yield Button("✗ Zrušiť", variant="error", id="cancel-dir")
+                yield Button("✓ Confirm", variant="success", id="confirm-dir")
+                yield Button("✗ Cancel", variant="error", id="cancel-dir")
 
     def on_directory_tree_directory_selected(self, event: DirectoryTree.DirectorySelected):
         self.selected_path = str(event.path)
@@ -156,10 +156,10 @@ class WallpaperManagerApp(App):
     """
 
     BINDINGS = [
-        ("n", "next_wallpaper", "Ďalší"),
+        ("n", "next_wallpaper", "Next"),
         ("space", "toggle_rotation", "Play/Pause"),
-        ("r", "refresh", "Obnoviť"),
-        ("q", "quit", "Koniec"),
+        ("r", "refresh", "Refresh"),
+        ("q", "quit", "Quit"),
     ]
 
     TITLE = "🖼  Wallpaper Manager"
@@ -175,34 +175,34 @@ class WallpaperManagerApp(App):
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Vertical(id="main-layout"):
-            yield Static("⚠  Daemon nebeží. Spusti: systemctl --user start wallpaper-daemon", id="daemon-warning")
+            yield Static("⚠  Daemon is not running. Start it with: systemctl --user start wallpaper-daemon", id="daemon-warning")
 
             with Container(classes="card"):
-                yield Label("◈  Aktuálny stav", classes="card-title")
+                yield Label("◈  Current Status", classes="card-title")
                 yield Label("", id="status-dot")
                 yield Label("", id="current-wallpaper")
                 yield Label("", id="wallpaper-count")
                 yield Label("", id="timer-display")
 
             with Container(classes="card"):
-                yield Label("◈  Ovládanie", classes="card-title")
+                yield Label("◈  Controls", classes="card-title")
                 with Horizontal(id="btn-row"):
-                    yield Button("⏭  Ďalší wallpaper", id="btn-next")
-                    yield Button("⏸  Pozastaviť", id="btn-toggle")
+                    yield Button("⏭  Next wallpaper", id="btn-next")
+                    yield Button("⏸  Pause", id="btn-toggle")
 
             with Container(classes="card"):
-                yield Label("◈  Nastavenia", classes="card-title")
+                yield Label("◈  Settings", classes="card-title")
                 with Horizontal(classes="setting-row"):
-                    yield Label("📁 Adresár:", classes="setting-label")
+                    yield Label("📁 Directory:", classes="setting-label")
                     yield Input("", id="input-dir")
-                    yield Button("Vybrať", id="btn-apply-dir")
+                    yield Button("Browse", id="btn-apply-dir")
                 with Horizontal(classes="setting-row"):
-                    yield Label("⏱  Interval (sek):", classes="setting-label")
+                    yield Label("⏱  Interval (sec):", classes="setting-label")
                     yield Input("", id="input-interval")
-                    yield Button("Použiť", id="btn-apply-interval")
+                    yield Button("Apply", id="btn-apply-interval")
 
             with Container(id="log-card"):
-                yield Label("◈  Denník", classes="card-title")
+                yield Label("◈  Log", classes="card-title")
                 yield Static("", id="log-content")
 
         yield Footer()
@@ -216,7 +216,7 @@ class WallpaperManagerApp(App):
         if status is None:
             self.connected = False
             self.query_one("#daemon-warning").display = True
-            self.query_one("#status-dot", Static).update("🔴  Daemon nie je spustený")
+            self.query_one("#status-dot", Static).update("🔴  Daemon is not running")
             self.query_one("#timer-display", Static).update("")
             return
 
@@ -226,7 +226,7 @@ class WallpaperManagerApp(App):
         self.paused = status.get("paused", False)
 
         dot = self.query_one("#status-dot", Static)
-        dot.update("🟢  Daemon beží" + ("  ⏸ pozastavené" if self.paused else ""))
+        dot.update("🟢  Daemon running" + ("  ⏸ paused" if self.paused else ""))
 
         current = status.get("current", "")
         name = Path(current).name if current else "—"
@@ -234,16 +234,16 @@ class WallpaperManagerApp(App):
 
         count = status.get("count", 0)
         d = status.get("dir", "")
-        self.query_one("#wallpaper-count", Static).update(f"📂 {d}  ({count} obrázkov)")
+        self.query_one("#wallpaper-count", Static).update(f"📂 {d}  ({count} images)")
 
         if not self.paused:
             countdown = status.get("countdown", 0)
             interval = status.get("interval", 0)
             self.query_one("#timer-display", Static).update(
-                f"⏱  Ďalšia zmena za: {format_interval(countdown)}  /  interval: {format_interval(interval)}"
+                f"⏱  Next change in: {format_interval(countdown)}  /  interval: {format_interval(interval)}"
             )
         else:
-            self.query_one("#timer-display", Static).update("⏸  Rotácia pozastavená")
+            self.query_one("#timer-display", Static).update("⏸  Rotation paused")
 
         dir_input = self.query_one("#input-dir", Input)
         if not dir_input.value:
@@ -258,10 +258,10 @@ class WallpaperManagerApp(App):
     def _update_toggle_btn(self):
         btn = self.query_one("#btn-toggle", Button)
         if self.paused:
-            btn.label = "▶  Spustiť"
+            btn.label = "▶  Resume"
             btn.add_class("paused")
         else:
-            btn.label = "⏸  Pozastaviť"
+            btn.label = "⏸  Pause"
             btn.remove_class("paused")
 
     def _add_log(self, message: str):
@@ -275,20 +275,20 @@ class WallpaperManagerApp(App):
     def action_next_wallpaper(self):
         res = send_command({"action": "next"})
         if res and res.get("ok"):
-            self._add_log("⏭  Manuálna zmena wallpaperu")
+            self._add_log("⏭  Wallpaper changed manually")
             self.set_timer(0.8, self.action_refresh)
         else:
-            self._add_log("✗ Daemon nedostupný")
+            self._add_log("✗ Daemon unavailable")
 
     @on(Button.Pressed, "#btn-toggle")
     def action_toggle_rotation(self):
         res = send_command({"action": "toggle"})
         if res and res.get("ok"):
             paused = res.get("paused", False)
-            self._add_log("⏸  Pozastavené" if paused else "▶  Spustené")
+            self._add_log("⏸  Paused" if paused else "▶  Resumed")
             self.action_refresh()
         else:
-            self._add_log("✗ Daemon nedostupný")
+            self._add_log("✗ Daemon unavailable")
 
     @on(Button.Pressed, "#btn-apply-dir")
     def pick_directory(self):
@@ -309,9 +309,9 @@ class WallpaperManagerApp(App):
                 self._add_log(f"✓ Interval: {format_interval(secs)}")
                 self.action_refresh()
             else:
-                self._add_log(f"✗ {res.get('error') if res else 'Daemon nedostupný'}")
+                self._add_log(f"✗ {res.get('error') if res else 'Daemon unavailable'}")
         except ValueError:
-            self._add_log("✗ Neplatná hodnota intervalu")
+            self._add_log("✗ Invalid interval value")
 
     @on(Input.Submitted, "#input-dir")
     def apply_dir_from_input(self, event: Input.Submitted):
@@ -324,10 +324,10 @@ class WallpaperManagerApp(App):
     def _apply_dir(self, path: str):
         res = send_command({"action": "set_dir", "dir": path})
         if res and res.get("ok"):
-            self._add_log(f"✓ Adresár: {path}")
+            self._add_log(f"✓ Directory: {path}")
             self.action_refresh()
         else:
-            self._add_log(f"✗ {res.get('error') if res else 'Daemon nedostupný'}")
+            self._add_log(f"✗ {res.get('error') if res else 'Daemon unavailable'}")
 
 
 if __name__ == "__main__":
