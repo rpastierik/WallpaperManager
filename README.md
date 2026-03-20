@@ -2,6 +2,9 @@
 
 Automatic random wallpaper rotation for **GNOME on Wayland**.
 
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![License](https://img.shields.io/badge/License-GPL%20v3-yellow)
+
 Consists of three parts:
 
 * **`wallpaper_daemon.py`** — runs in the background as a systemd user service, rotates wallpapers
@@ -189,3 +192,9 @@ gnome-extensions enable ubuntu-appindicators@ubuntu.com
 systemctl --user start wallpaper-daemon
 journalctl --user -u wallpaper-daemon -n 20
 ```
+
+## Support
+
+If you find this tool useful, consider supporting development:
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20me-ff5e5b?logo=ko-fi)](https://ko-fi.com/rpastierik)
