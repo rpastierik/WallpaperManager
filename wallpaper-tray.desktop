@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Wallpaper Manager Tray
+Comment=System tray controller for Wallpaper Manager daemon
+Exec=python3 %h/.local/bin/wallpaper_tray.py
+Icon=preferences-desktop-wallpaper
+Categories=Utility;
+StartupNotify=false
+X-GNOME-Autostart-enabled=true
