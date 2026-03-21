@@ -37,8 +37,8 @@ gnome-extensions enable ubuntu-appindicators@ubuntu.com
 ### Wallpaper manager (TUI)
 ![wallpaper manager](screenshots/wallpaper_manager.png)
 
-### Wallpaper try
-![Wallpaper Try](screenshots/wallpaper_try.png)
+### Wallpaper tray
+![Wallpaper Tray](screenshots/wallpaper_try.png)
 
 ---
 
